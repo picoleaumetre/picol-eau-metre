@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Picol'eaumètre 💧</title>
+<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#3BAFDA; --blue-dark:#1a8fb5;
+  --yellow:#F5C842; --green:#6BD98A;
+  --purple:#C4A8F5; --pink:#F97BB6;
+  --bg:#0d1b2a; --card:#152234; --card2:#1c2e44;
+  --text:#e8f4fd; --muted:#7a9bb5;
+  --radius:20px; --shadow:0 8px 32px rgba(0,0,0,0.4);
+  --admin:#FF6B35;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* BUBBLES */
+.bubbles-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bubble{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(59,175,218,0.18),rgba(59,175,218,0.03));border:1px solid rgba(59,175,218,0.12);animation:floatUp linear infinite;}
+@keyframes floatUp{0%{transform:translateY(110vh) scale(1);opacity:0;}10%{opacity:1;}90%{opacity:0.6;}100%{transform:translateY(-20vh) scale(1.1);opacity:0;}}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,27,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(59,175,218,0.2);display:flex;align-items:center;justify-content:space-between;padding:14px 24px;}
+.nav-logo{font-family:'Righteous',cursive;font-size:1.4rem;color:var(--blue);display:flex;align-items:center;gap:8px;cursor:pointer;}
+.nav-logo span{color:var(--text);}
+.nav-links{display:flex;gap:6px;}
+.nav-btn{background:none;border:none;color:var(--muted);font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;padding:7px 14px;border-radius:50px;cursor:pointer;transition:all 0.2s;}
+.nav-btn:hover,.nav-btn.active{background:rgba(59,175,218,0.15);color:var(--blue);}
+.nav-btn:disabled{opacity:0.3;cursor:not-allowed;pointer-events:none;}
+
+/* PAGES */
+.page{display:none;position:relative;z-index:1;min-height:calc(100vh - 65px);}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@keyframes fadeInScale{from{opacity:0;transform:scale(0.96);}to{opacity:1;transform:scale(1);}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}60%{transform:translateX(7px)}}
+
+/* ── PAGE ACCUEIL ── */
+.welcome-page{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 65px);padding:40px 20px;text-align:center;}
+.welcome-logo{font-family:'Righteous',cursive;font-size:clamp(2.4rem,8vw,4rem);line-height:1;margin-bottom:8px;background:linear-gradient(135deg,var(--blue),var(--green),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.welcome-drop{font-size:clamp(3rem,10vw,5.5rem);margin-bottom:16px;display:block;filter:drop-shadow(0 0 24px rgba(59,175,218,0.5));animation:floatDrop 3s ease-in-out infinite;}
+@keyframes floatDrop{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+.welcome-sub{color:var(--muted);font-size:1rem;max-width:320px;margin:0 auto 40px;line-height:1.6;}
+.pwd-card{background:var(--card);border-radius:var(--radius);border:1px solid rgba(59,175,218,0.2);padding:32px 28px;width:100%;max-width:380px;box-shadow:var(--shadow);animation:fadeInScale .4s;}
+.pwd-card-title{font-family:'Righteous',cursive;font-size:.9rem;color:var(--muted);margin-bottom:18px;text-transform:uppercase;letter-spacing:.06em;}
+.pwd-field{width:100%;background:rgba(59,175,218,0.07);border:1.5px solid rgba(59,175,218,0.25);border-radius:14px;padding:16px 18px;color:var(--text);font-family:'Nunito',sans-serif;font-size:1.15rem;font-weight:700;outline:none;transition:border-color .2s;text-align:center;letter-spacing:.12em;margin-bottom:14px;}
+.pwd-field:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,175,218,0.12);}
+.pwd-field::placeholder{color:var(--muted);letter-spacing:0;font-size:.9rem;font-weight:400;}
+.btn-enter{width:100%;background:linear-gradient(135deg,var(--blue),#1e9eca);border:none;border-radius:14px;padding:16px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1.05rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(59,175,218,0.3);}
+.btn-enter:hover{transform:translateY(-2px);}
+.pwd-error{color:var(--pink);font-size:.82rem;font-weight:700;margin-top:10px;display:none;text-align:center;}
+.welcome-admin-btn{margin-top:28px;background:none;border:1px solid rgba(255,107,53,0.25);border-radius:50px;padding:9px 22px;color:rgba(255,107,53,0.5);font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .25s;text-transform:uppercase;letter-spacing:.05em;}
+.welcome-admin-btn:hover{border-color:var(--admin);color:var(--admin);background:rgba(255,107,53,0.08);}
+
+/* ── HERO / INSCRIPTION ── */
+.hero{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px 40px;text-align:center;min-height:calc(100vh - 65px);}
+.hero-badge{background:rgba(59,175,218,0.15);border:1px solid rgba(59,175,218,0.35);color:var(--blue);font-size:0.8rem;font-weight:700;letter-spacing:.08em;padding:5px 16px;border-radius:50px;margin-bottom:20px;text-transform:uppercase;}
+.hero h1{font-family:'Righteous',cursive;font-size:clamp(2.2rem,7vw,3.6rem);line-height:1.1;margin-bottom:12px;background:linear-gradient(135deg,var(--blue),var(--green),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.hero p{color:var(--muted);font-size:1.05rem;max-width:380px;margin-bottom:40px;}
+.phone-wrap{perspective:800px;}
+.phone{width:300px;background:var(--card);border-radius:36px;border:3px solid rgba(59,175,218,0.3);box-shadow:0 0 60px rgba(59,175,218,0.15),var(--shadow);overflow:hidden;}
+.phone-notch{height:28px;background:#0a1520;display:flex;align-items:center;justify-content:center;}
+.phone-notch-bar{width:60px;height:5px;background:#1e3248;border-radius:3px;}
+.phone-body{padding:20px;}
+.form-screen h3,.main-screen h3{font-family:'Righteous',cursive;font-size:1rem;color:var(--blue);margin-bottom:16px;text-align:center;}
+.input-field{width:100%;background:rgba(59,175,218,0.08);border:1.5px solid rgba(59,175,218,0.25);border-radius:12px;padding:12px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:0.95rem;margin-bottom:12px;outline:none;transition:border-color .2s;}
+.input-field:focus{border-color:var(--blue);}
+.input-field::placeholder{color:var(--muted);}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--blue),#1e9eca);border:none;border-radius:12px;padding:13px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(59,175,218,0.3);}
+.btn-primary:hover{transform:translateY(-2px);}
+.url-hint{color:var(--muted);font-size:0.72rem;text-align:center;margin-top:10px;}
+.card-tile{border-radius:14px;padding:14px 16px;margin-bottom:10px;font-weight:800;font-size:1rem;cursor:pointer;transition:opacity .15s;}
+.card-tile:hover{opacity:.82;}
+.tile-green{background:rgba(107,217,138,0.18);border:1.5px solid rgba(107,217,138,0.4);color:var(--green);}
+.tile-yellow{background:rgba(245,200,66,0.18);border:1.5px solid rgba(245,200,66,0.4);color:var(--yellow);font-size:1.1rem;text-align:center;}
+.tile-purple{background:rgba(196,168,245,0.18);border:1.5px solid rgba(196,168,245,0.4);color:var(--purple);font-size:.88rem;}
+
+/* ── NAVIGATION FLÈCHES ── */
+.page-nav{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 32px;max-width:700px;margin:0 auto;flex-wrap:wrap;gap:12px;}
+.page-nav-col{display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px 24px 32px;max-width:700px;margin:0 auto;}
+.nav-dots{display:flex;gap:7px;align-items:center;}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all .2s;}
+.nav-dot.active{background:var(--blue);width:20px;border-radius:4px;}
+.nav-arrow{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.1);border-radius:50px;padding:11px 20px;color:var(--muted);font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.nav-arrow:hover{background:rgba(59,175,218,0.12);border-color:rgba(59,175,218,0.35);color:var(--blue);}
+.nav-arrow.next{background:rgba(59,175,218,0.1);border-color:rgba(59,175,218,0.3);color:var(--blue);}
+.btn-deconnect{background:rgba(249,123,182,0.1);border:1.5px solid rgba(249,123,182,0.3);border-radius:50px;padding:11px 28px;color:var(--pink);font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-deconnect:hover{background:rgba(249,123,182,0.2);}
+
+/* ── DASHBOARD ── */
+.dashboard{padding:32px 20px 0;max-width:700px;margin:0 auto;}
+.section-title{font-family:'Righteous',cursive;font-size:1.6rem;margin-bottom:24px;display:flex;align-items:center;gap:10px;}
+.section-title .dot{width:10px;height:10px;border-radius:50%;background:var(--blue);}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.stat-card{background:var(--card);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.07);padding:20px 16px;text-align:center;box-shadow:var(--shadow);}
+.stat-num{font-family:'Righteous',cursive;font-size:2rem;background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.stat-label{color:var(--muted);font-size:.78rem;font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+.gauge-card{background:var(--card);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.07);padding:24px;margin-bottom:22px;box-shadow:var(--shadow);}
+.gauge-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.gauge-title{font-weight:800;font-size:1rem;}
+.gauge-pct{font-family:'Righteous',cursive;font-size:1.4rem;color:var(--green);}
+.gauge-bar-bg{height:22px;background:rgba(255,255,255,0.06);border-radius:50px;overflow:hidden;}
+.gauge-bar-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--blue),var(--green),var(--yellow));transition:width 1s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;}
+.gauge-bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);animation:shimmer 2s infinite;}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.gauge-paliers{display:flex;justify-content:space-between;margin-top:10px;font-size:.72rem;color:var(--muted);font-weight:700;}
+.palier-hit{color:var(--green);}
+.leaderboard{background:var(--card);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);border:1px solid rgba(255,255,255,0.07);margin-bottom:22px;}
+.lb-row{display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.lb-row:last-child{border-bottom:none;}
+.lb-rank{font-family:'Righteous',cursive;font-size:1.1rem;width:28px;text-align:center;}
+.lb-rank.gold{color:#FFD700;}.lb-rank.silver{color:#C0C0C0;}.lb-rank.bronze{color:#CD7F32;}
+.lb-name{flex:1;font-weight:700;}.lb-date{color:var(--muted);font-size:.8rem;}
+.lb-verres{font-family:'Righteous',cursive;color:var(--blue);font-size:1.1rem;}
+.live-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(107,217,138,0.15);border:1px solid rgba(107,217,138,0.35);border-radius:50px;padding:4px 12px;font-size:.78rem;font-weight:700;color:var(--green);}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.btn-simulate{background:linear-gradient(135deg,var(--blue),#1e9eca);border:none;border-radius:12px;padding:13px 32px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(59,175,218,0.3);}
+.btn-simulate:hover{transform:translateY(-2px);}
+.btn-discover{background:linear-gradient(135deg,var(--yellow),#e0a800);border:none;border-radius:12px;padding:13px 32px;color:#0d1b2a;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;animation:fadeIn .4s;}
+.btn-discover:hover{transform:translateY(-2px);}
+
+/* ── ABOUT ── */
+.about-page{padding:40px 20px 0;max-width:660px;margin:0 auto;}
+.about-hero{text-align:center;padding:40px 20px;background:var(--card);border-radius:var(--radius);border:1px solid rgba(255,255,255,.07);margin-bottom:24px;box-shadow:var(--shadow);}
+.about-hero .big-emoji{font-size:4rem;margin-bottom:12px;display:block;}
+.about-hero h2{font-family:'Righteous',cursive;font-size:1.8rem;margin-bottom:8px;}
+.about-hero p{color:var(--muted);line-height:1.6;}
+.about-card{background:var(--card);border-radius:var(--radius);border:1px solid rgba(255,255,255,.07);padding:22px;margin-bottom:18px;box-shadow:var(--shadow);}
+.about-card h3{font-family:'Righteous',cursive;font-size:1.05rem;margin-bottom:12px;}
+.about-card p,.about-card li{color:var(--muted);line-height:1.65;font-size:.93rem;}
+.about-card ul{padding-left:18px;display:flex;flex-direction:column;gap:6px;}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;}
+.team-chip{background:rgba(59,175,218,.1);border:1px solid rgba(59,175,218,.25);border-radius:10px;padding:9px 12px;font-size:.84rem;font-weight:700;color:var(--blue);text-align:center;}
+.sponsor-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;}
+.sponsor-chip{background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.25);border-radius:50px;padding:5px 14px;font-size:.8rem;font-weight:700;color:var(--yellow);}
+.obj-list{display:flex;flex-direction:column;gap:8px;}
+.obj-row{display:flex;align-items:flex-start;gap:10px;}
+.obj-icon{font-size:1.1rem;margin-top:1px;flex-shrink:0;}
+.obj-text{color:var(--muted);font-size:.9rem;line-height:1.5;}
+
+/* ── ADMIN ── */
+.admin-page{padding:28px 20px 40px;max-width:720px;margin:0 auto;animation:fadeIn .35s;}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px;}
+.admin-title{font-family:'Righteous',cursive;font-size:1.7rem;display:flex;align-items:center;gap:12px;}
+.admin-title-dot{width:12px;height:12px;border-radius:50%;background:var(--admin);box-shadow:0 0 12px rgba(255,107,53,0.6);}
+.btn-logout{background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:50px;padding:8px 18px;color:var(--admin);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-logout:hover{background:rgba(255,107,53,0.2);}
+.admin-section{background:var(--card);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.07);padding:24px;margin-bottom:18px;box-shadow:var(--shadow);}
+.admin-section-title{font-family:'Righteous',cursive;font-size:1rem;margin-bottom:20px;display:flex;align-items:center;gap:8px;color:var(--yellow);}
+.soiree-pwd-display{display:flex;align-items:center;gap:12px;background:rgba(59,175,218,0.07);border:1.5px solid rgba(59,175,218,0.25);border-radius:14px;padding:16px 20px;margin-bottom:14px;}
+.soiree-pwd-value{font-family:'Righteous',cursive;font-size:2rem;color:var(--blue);letter-spacing:.12em;flex:1;}
+.btn-copy{background:rgba(59,175,218,0.15);border:1.5px solid rgba(59,175,218,0.3);border-radius:10px;padding:8px 14px;color:var(--blue);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-copy:hover{background:rgba(59,175,218,0.28);}
+.btn-generate{width:100%;background:linear-gradient(135deg,var(--blue),#1e9eca);border:none;border-radius:12px;padding:14px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(59,175,218,0.3);display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-generate:hover{transform:translateY(-2px);}
+.soiree-pwd-hint{color:var(--muted);font-size:.8rem;margin-top:10px;line-height:1.5;text-align:center;}
+.soiree-pwd-custom-row{display:flex;gap:10px;margin-top:12px;}
+.soiree-pwd-custom-input{flex:1;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:11px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;outline:none;transition:border-color .2s;}
+.soiree-pwd-custom-input:focus{border-color:var(--blue);}
+.btn-set-custom{background:rgba(107,217,138,0.15);border:1.5px solid rgba(107,217,138,0.35);border-radius:12px;padding:11px 18px;color:var(--green);font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.btn-set-custom:hover{background:rgba(107,217,138,0.28);}
+.verre-counter-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;}
+.verre-counter-display{font-family:'Righteous',cursive;font-size:4rem;background:linear-gradient(135deg,var(--blue),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:100px;text-align:center;line-height:1;}
+.counter-btn{width:52px;height:52px;border-radius:50%;border:none;font-size:1.5rem;font-weight:900;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.counter-btn-minus{background:rgba(249,123,182,0.15);border:2px solid rgba(249,123,182,0.4);color:var(--pink);}
+.counter-btn-minus:hover{background:rgba(249,123,182,0.3);transform:scale(1.1);}
+.counter-btn-plus{background:rgba(107,217,138,0.15);border:2px solid rgba(107,217,138,0.4);color:var(--green);}
+.counter-btn-plus:hover{background:rgba(107,217,138,0.3);transform:scale(1.1);}
+.counter-manual-row{display:flex;align-items:center;gap:10px;justify-content:center;}
+.counter-manual-input{background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px 16px;color:var(--text);font-family:'Righteous',cursive;font-size:1.1rem;width:120px;text-align:center;outline:none;transition:border-color .2s;}
+.counter-manual-input:focus{border-color:var(--blue);}
+.btn-set{background:rgba(59,175,218,0.15);border:1.5px solid rgba(59,175,218,0.4);border-radius:10px;padding:10px 20px;color:var(--blue);font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;transition:all .2s;}
+.btn-set:hover{background:rgba(59,175,218,0.28);}
+.palier-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.palier-config-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;}
+.palier-config-label{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.palier-config-emoji{font-size:1.2rem;}
+.palier-config-name{font-weight:800;font-size:.9rem;}
+.palier-config-sub{color:var(--muted);font-size:.73rem;margin-top:1px;}
+.palier-input-row{display:flex;align-items:center;gap:8px;}
+.palier-num-input{background:rgba(245,200,66,0.08);border:1.5px solid rgba(245,200,66,0.3);border-radius:10px;padding:8px 12px;color:var(--yellow);font-family:'Righteous',cursive;font-size:1.1rem;width:80px;text-align:center;outline:none;transition:border-color .2s;}
+.palier-num-input:focus{border-color:var(--yellow);}
+.palier-unit{color:var(--muted);font-size:.8rem;font-weight:700;}
+.toggle-switch{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0;}
+.toggle-switch input{display:none;}
+.toggle-track{position:absolute;inset:0;border-radius:50px;background:rgba(255,255,255,0.12);transition:.3s;}
+.toggle-switch input:checked + .toggle-track{background:var(--green);}
+.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.3s;}
+.toggle-switch input:checked + .toggle-track::after{transform:translateX(20px);}
+.lot-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.lot-input-wrap label{display:block;color:var(--muted);font-size:.76rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.lot-input{width:100%;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.95rem;outline:none;transition:border-color .2s;}
+.lot-input:focus{border-color:var(--yellow);}
+.btn-save-admin{background:linear-gradient(135deg,var(--yellow),#e0a800);border:none;border-radius:12px;padding:13px 28px;color:#0d1b2a;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .2s;}
+.btn-save-admin:hover{transform:translateY(-2px);}
+.participants-count{display:flex;align-items:center;gap:12px;margin-bottom:18px;}
+.participants-num{font-family:'Righteous',cursive;font-size:2.2rem;color:var(--purple);}
+.participants-label{color:var(--muted);font-size:.85rem;line-height:1.4;}
+.lottery-lot-input-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+.lottery-lot-label{color:var(--muted);font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
+.lottery-lot-input{flex:1;background:rgba(196,168,245,0.08);border:1.5px solid rgba(196,168,245,0.3);border-radius:12px;padding:10px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;outline:none;transition:border-color .2s;}
+.lottery-lot-input:focus{border-color:var(--purple);}
+.btn-tirage{width:100%;background:linear-gradient(135deg,var(--purple),#a78de0);border:none;border-radius:14px;padding:16px;color:#fff;font-family:'Righteous',cursive;font-size:1.1rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(196,168,245,0.3);display:flex;align-items:center;justify-content:center;gap:10px;}
+.btn-tirage:hover{transform:translateY(-2px);}
+.btn-tirage:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.slot-display{font-family:'Righteous',cursive;font-size:1.5rem;color:var(--purple);min-height:44px;text-align:center;display:flex;align-items:center;justify-content:center;margin-bottom:12px;border-radius:10px;background:rgba(196,168,245,0.08);padding:10px;}
+@keyframes slotSpin{0%{opacity:.3;transform:translateY(-3px);}50%{opacity:1;}100%{opacity:.3;transform:translateY(3px);}}
+.winner-box{display:none;background:linear-gradient(135deg,rgba(196,168,245,0.15),rgba(107,217,138,0.1));border:1.5px solid rgba(196,168,245,0.4);border-radius:18px;padding:24px;text-align:center;margin-top:16px;animation:fadeInScale .5s;}
+.winner-box.show{display:block;}
+.winner-emoji{font-size:2.8rem;margin-bottom:8px;display:block;}
+.winner-label{color:var(--muted);font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;}
+.winner-name{font-family:'Righteous',cursive;font-size:1.8rem;color:var(--yellow);margin-bottom:4px;}
+.winner-sub{color:var(--muted);font-size:.82rem;}
+.csv-dl-btn{width:100%;background:linear-gradient(135deg,var(--green),#4ab870);border:none;border-radius:12px;padding:14px;color:#0d1b2a;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(107,217,138,0.3);display:flex;align-items:center;justify-content:center;gap:8px;}
+.csv-dl-btn:hover{transform:translateY(-2px);}
+.reset-card{background:rgba(249,123,182,0.05);border:1px solid rgba(249,123,182,0.2);border-radius:var(--radius);padding:24px;}
+.reset-warning{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px;}
+.reset-warning-icon{font-size:1.4rem;flex-shrink:0;margin-top:2px;}
+.reset-warning-text{color:var(--muted);font-size:.88rem;line-height:1.55;}
+.reset-warning-text strong{color:var(--text);}
+.btn-reset-confirm{background:linear-gradient(135deg,var(--pink),#e0609a);border:none;border-radius:12px;padding:13px 28px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .2s;}
+.btn-reset-confirm:hover{transform:translateY(-2px);}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:600;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);}
+.modal-box{position:relative;background:var(--card);border-radius:var(--radius);padding:32px 28px;max-width:360px;width:100%;animation:fadeInScale .3s;z-index:1;}
+.admin-modal-box{border:1px solid rgba(255,107,53,0.3);box-shadow:0 0 60px rgba(255,107,53,0.12),var(--shadow);}
+.lots-modal-box{border:1px solid rgba(245,200,66,0.3);box-shadow:0 0 60px rgba(245,200,66,0.1),var(--shadow);}
+.modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.07);border:none;border-radius:50%;width:32px;height:32px;color:var(--muted);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:rgba(255,255,255,0.14);color:var(--text);}
+.modal-icon{font-size:2.8rem;text-align:center;margin-bottom:12px;}
+.modal-title{font-family:'Righteous',cursive;font-size:1.4rem;text-align:center;margin-bottom:4px;color:var(--admin);}
+.modal-sub{color:var(--muted);font-size:.85rem;text-align:center;margin-bottom:24px;line-height:1.5;}
+.admin-pwd-input{width:100%;background:rgba(255,107,53,0.07);border:1.5px solid rgba(255,107,53,0.3);border-radius:12px;padding:14px 16px;color:var(--text);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:700;outline:none;transition:border-color .2s;letter-spacing:.1em;text-align:center;margin-bottom:12px;}
+.admin-pwd-input:focus{border-color:var(--admin);}
+.admin-pwd-input::placeholder{color:var(--muted);letter-spacing:0;font-size:.9rem;font-weight:400;}
+.btn-admin-submit{width:100%;background:linear-gradient(135deg,var(--admin),#e85a22);border:none;border-radius:12px;padding:14px;color:#fff;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;}
+.btn-admin-submit:hover{transform:translateY(-1px);}
+.modal-error{color:var(--pink);font-size:.8rem;font-weight:700;text-align:center;margin-top:8px;display:none;}
+.btn-modal-cancel{width:100%;background:none;border:none;color:var(--muted);font-family:'Nunito',sans-serif;font-size:.85rem;cursor:pointer;margin-top:10px;padding:6px;}
+.btn-modal-cancel:hover{color:var(--text);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--card2);border:1px solid rgba(107,217,138,.4);border-radius:50px;padding:12px 24px;display:flex;align-items:center;gap:10px;color:var(--green);font-weight:700;font-size:.9rem;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;transition:transform .4s cubic-bezier(.4,0,.2,1);white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+@media(max-width:540px){
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .stats-row .stat-card:last-child{grid-column:1/-1;}
+  .palier-config-grid,.lot-config-grid{grid-template-columns:1fr;}
+  nav{padding:12px 14px;}
+  .nav-btn{padding:6px 9px;font-size:.78rem;}
+  .phone{width:270px;}
+  .verre-counter-display{font-size:3rem;}
+  .soiree-pwd-value{font-size:1.5rem;}
+}
+</style>
+</head>
+<body>
+<div class="bubbles-bg" id="bubblesBg"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="goHome()">💧 <span>Picol'eaumètre</span></div>
+  <div class="nav-links">
+    <button class="nav-btn" id="navInscription" onclick="showPage('inscription',this)" disabled>📱 Inscrip.</button>
+    <button class="nav-btn" id="navDashboard" onclick="showPage('dashboard',this)" disabled>📊 Tableau</button>
+    <button class="nav-btn" id="navAbout" onclick="showPage('about',this)" disabled>ℹ️ Projet</button>
+  </div>
+</nav>
+
+<!-- ══ PAGE ACCUEIL ══ -->
+<div class="page active" id="page-accueil">
+  <div class="welcome-page">
+    <span class="welcome-drop">💧</span>
+    <div class="welcome-logo">Picol'eaumètre</div>
+    <p class="welcome-sub">Soirée BDE · IMT Atlantique<br>Entre le mot de passe de la soirée pour rejoindre le défi !</p>
+    <div class="pwd-card">
+      <div class="pwd-card-title">🔑 Mot de passe soirée</div>
+      <input class="pwd-field" type="password" id="soireePwdInput" placeholder="••••••••" maxlength="20"
+        onkeydown="if(event.key==='Enter') submitSoireePwd()" />
+      <div class="pwd-error" id="soireePwdError">❌ Mot de passe incorrect</div>
+      <button class="btn-enter" onclick="submitSoireePwd()">Entrer 🚀</button>
+    </div>
+    <button class="welcome-admin-btn" onclick="openAdminModal()">⚙️ Interface Administrateur</button>
+  </div>
+</div>
+
+<!-- ══ PAGE INSCRIPTION ══ -->
+<div class="page" id="page-inscription">
+  <div class="hero">
+    <div class="hero-badge">💧 Soirée BDE · IMT Atlantique</div>
+    <h1>Le Défi<br>Hydratation !</h1>
+    <p>Super ! Maintenant inscris-toi pour rejoindre le défi collectif 🎉</p>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-notch"><div class="phone-notch-bar"></div></div>
+          <div class="phone-body">
+            <div class="form-screen" id="formScreen">
+              <h3>💧 Rejoins le défi !</h3>
+              <input class="input-field" type="text" id="inputNom" placeholder="NOM" />
+              <input class="input-field" type="text" id="inputPrenom" placeholder="PRÉNOM" />
+              <button class="btn-primary" onclick="handleInscription()">Valider →</button>
+              <div class="url-hint">https://picoleau.imt-atlantique.fr</div>
+            </div>
+            <div class="main-screen" id="mainScreen" style="display:none;">
+              <h3 id="welcomeMsg">Bienvenue !</h3>
+              <div class="card-tile tile-green" onclick="showPage('dashboard',document.getElementById('navDashboard'))">📊 Stats du mois<br><span style="font-size:.8rem;font-weight:600;opacity:.7">Verres collectifs</span></div>
+              <div class="card-tile tile-yellow" onclick="openLotsModal()">🏆 LOT À GAGNER<br><span style="font-size:.75rem;font-weight:600;">Voir les paliers →</span></div>
+              <div class="card-tile tile-purple" onclick="showPage('about',document.getElementById('navAbout'))">🔍 En savoir + sur le projet →</div>
+              <div class="url-hint" style="margin-top:10px;">https://picoleau.imt-atlantique.fr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p style="color:var(--muted);font-size:.78rem;margin-top:6px;">⬆️ Remplis le formulaire et valide !</p>
+    </div>
+  </div>
+  <div class="page-nav-col">
+    <div class="nav-dots">
+      <div class="nav-dot active"></div>
+      <div class="nav-dot"></div>
+      <div class="nav-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE DASHBOARD ══ -->
+<div class="page" id="page-dashboard">
+  <div class="dashboard">
+    <div class="section-title"><div class="dot"></div> Tableau de bord<span class="live-badge" style="margin-left:auto;"><span class="live-dot"></span> Live</span></div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="dashVerres">0</div><div class="stat-label">Verres ce soir</div></div>
+      <div class="stat-card"><div class="stat-num" style="background:linear-gradient(135deg,var(--yellow),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;" id="dashPaliers">0</div><div class="stat-label">Paliers atteints</div></div>
+      <div class="stat-card"><div class="stat-num" style="background:linear-gradient(135deg,var(--purple),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">1247</div><div class="stat-label">Total mensuel</div></div>
+    </div>
+    <div class="gauge-card">
+      <div class="gauge-header"><div class="gauge-title">🎯 Défi collectif – Ce soir</div><div class="gauge-pct" id="gaugePct">0%</div></div>
+      <div class="gauge-bar-bg"><div class="gauge-bar-fill" id="gaugeBar" style="width:0%"></div></div>
+      <div class="gauge-paliers" id="gaugeLabels"></div>
+      <div id="nextPalierBox" style="margin-top:14px;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.3);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.4rem;">🏆</span>
+        <div><div style="font-weight:800;font-size:.88rem;color:var(--yellow);" id="nextPalierText">Prochain palier : 10 verres</div><div style="color:var(--muted);font-size:.78rem;" id="nextPalierSub">Encore 10 verres !</div></div>
+      </div>
+    </div>
+    <div class="leaderboard">
+      <div style="font-family:'Righteous',cursive;font-size:1.1rem;margin-bottom:16px;">🏅 Classement des soirées</div>
+      <div class="lb-row"><div class="lb-rank gold">①</div><div class="lb-name">Gala de printemps</div><div class="lb-date">15 mars</div><div class="lb-verres">203 💧</div></div>
+      <div class="lb-row"><div class="lb-rank silver">②</div><div class="lb-name">Soirée Intégration</div><div class="lb-date">8 fév.</div><div class="lb-verres">187 💧</div></div>
+      <div class="lb-row"><div class="lb-rank bronze">③</div><div class="lb-name">Soirée BDE Mars</div><div class="lb-date">21 mars</div><div class="lb-verres">78 💧</div></div>
+      <div class="lb-row"><div class="lb-rank" style="color:var(--muted);">④</div><div class="lb-name">Soirée Ski</div><div class="lb-date">28 jan.</div><div class="lb-verres">61 💧</div></div>
+    </div>
+    <div style="text-align:center;margin-top:8px;" id="simulateArea">
+      <button class="btn-simulate" onclick="simulateVerre()">🔔 Simuler +1 verre</button>
+    </div>
+  </div>
+  <div class="page-nav-col">
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:700px;padding:0 24px;">
+      <button class="nav-arrow" onclick="showPage('inscription',document.getElementById('navInscription'))">← Inscription</button>
+      <div class="nav-dots">
+        <div class="nav-dot"></div>
+        <div class="nav-dot active"></div>
+        <div class="nav-dot"></div>
+      </div>
+      <button class="nav-arrow next" onclick="showPage('about',document.getElementById('navAbout'))">Projet →</button>
+    </div>
+    <button class="btn-deconnect" onclick="deconnecterUtilisateur()">👋 Se déconnecter</button>
+  </div>
+</div>
+
+<!-- ══ PAGE À PROPOS ══ -->
+<div class="page" id="page-about">
+  <div class="about-page">
+    <div class="about-hero"><span class="big-emoji">💧</span><h2>Picol'eaumètre</h2><p>Un dispositif ludique pour encourager l'hydratation lors des soirées étudiantes de l'IMT Atlantique — sans moraliser, juste en s'amusant collectivement.</p></div>
+    <div class="about-card"><h3 style="color:var(--blue);">🎯 Pourquoi ce projet ?</h3><div class="obj-list"><div class="obj-row"><div class="obj-icon">💧</div><div class="obj-text">Encourager l'hydratation en soirée via un défi collectif festif et non moralisateur.</div></div><div class="obj-row"><div class="obj-icon">📊</div><div class="obj-text">Mesurer l'impact réel : comparer les soirées avec et sans dispositif.</div></div><div class="obj-row"><div class="obj-icon">🏆</div><div class="obj-text">Récompenser collectivement grâce à des lots offerts par des sponsors.</div></div><div class="obj-row"><div class="obj-icon">🔒</div><div class="obj-text">Aucune donnée personnelle collectée — anonymat total garanti.</div></div></div></div>
+    <div class="about-card"><h3 style="color:var(--green);">⚙️ Comment ça marche ?</h3><ul><li>Le barman sert un verre d'eau de 25 cl et appuie sur le <strong>buzzer</strong>.</li><li>La jauge collective s'incrémente en temps réel sur l'écran.</li><li>À chaque palier atteint : signal sonore, LEDs clignotantes et annonce !</li><li>En fin de soirée : tirage au sort parmi les participants pour le lot.</li></ul></div>
+    <div class="about-card"><h3 style="color:var(--yellow);">🎁 Sponsors</h3><div class="sponsor-row"><span class="sponsor-chip">JBL</span><span class="sponsor-chip">AirUp</span><span class="sponsor-chip">NordVPN</span><span class="sponsor-chip">Deezer</span><span class="sponsor-chip">Holy</span><span class="sponsor-chip">Carrefour</span><span class="sponsor-chip">Pepe Chicken</span><span class="sponsor-chip">IMT Atlantique</span></div></div>
+    <div class="about-card"><h3 style="color:var(--purple);">👥 L'équipe – Groupe 13</h3><div class="team-grid"><div class="team-chip">Mohamed DAOUDI</div><div class="team-chip">Nada EL KAHOUI</div><div class="team-chip">Aïcha EL KOUCH</div><div class="team-chip">Iness LAZAAR</div><div class="team-chip">Thomas MATHOREL</div><div class="team-chip">Victor VALLET</div></div><p style="margin-top:14px;font-size:.82rem;">Projet S6 – IMT Atlantique, Brest · Encadré par Sylvie Kerouedan · Client : Ronan Hamonou</p></div>
+  </div>
+  <div class="page-nav-col">
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;max-width:700px;padding:0 24px;">
+      <button class="nav-arrow" onclick="showPage('dashboard',document.getElementById('navDashboard'))">← Tableau</button>
+      <div class="nav-dots">
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot active"></div>
+      </div>
+      <div style="width:100px;"></div>
+    </div>
+    <button class="btn-deconnect" onclick="deconnecterUtilisateur()">👋 Se déconnecter</button>
+  </div>
+</div>
+
+<!-- ══ PAGE ADMIN ══ -->
+<div class="page" id="page-admin">
+  <div class="admin-page">
+    <div class="admin-header">
+      <div class="admin-title"><div class="admin-title-dot"></div> Interface Admin</div>
+      <button class="btn-logout" onclick="logoutAdmin()">🔒 Déconnexion</button>
+    </div>
+
+    <!-- MOT DE PASSE SOIRÉE -->
+    <div class="admin-section">
+      <div class="admin-section-title">🔑 Mot de passe de la soirée</div>
+      <div class="soiree-pwd-display">
+        <div class="soiree-pwd-value" id="soireePwdDisplay">——</div>
+        <button class="btn-copy" onclick="copyPwd()">📋 Copier</button>
+      </div>
+      <button class="btn-generate" onclick="generatePwd()">🎲 Générer un nouveau mot de passe aléatoire</button>
+      <div class="soiree-pwd-hint">Ce mot de passe est demandé à l'entrée du site. Il est sauvegardé et reste valide jusqu'à ce que vous en génériez un nouveau.</div>
+      <div class="soiree-pwd-custom-row">
+        <input class="soiree-pwd-custom-input" type="text" id="customPwdInput" placeholder="Ou entrez votre propre mot de passe…" maxlength="20" />
+        <button class="btn-set-custom" onclick="setCustomPwd()">Définir</button>
+      </div>
+    </div>
+
+    <!-- COMPTEUR -->
+    <div class="admin-section">
+      <div class="admin-section-title">💧 Compteur de verres</div>
+      <div class="verre-counter-row">
+        <button class="counter-btn counter-btn-minus" onclick="changeVerres(-1)">−</button>
+        <div class="verre-counter-display" id="adminVerresDisplay">0</div>
+        <button class="counter-btn counter-btn-plus" onclick="changeVerres(1)">+</button>
+      </div>
+      <div class="counter-manual-row">
+        <input class="counter-manual-input" type="number" id="manualVerresInput" placeholder="Ex: 42" />
+        <button class="btn-set" onclick="setVerresManual()">Définir</button>
+        <button class="btn-set" style="background:rgba(249,123,182,0.12);border-color:rgba(249,123,182,0.4);color:var(--pink);" onclick="resetVerres()">🔄 Remettre à 0</button>
+      </div>
+    </div>
+
+    <!-- PALIERS -->
+    <div class="admin-section">
+      <div class="admin-section-title">🎯 Configuration des paliers</div>
+      <div class="palier-config-grid">
+        <div class="palier-config-item"><div class="palier-config-label"><span class="palier-config-emoji">🎵</span><div><div class="palier-config-name">Palier 1</div><div class="palier-config-sub">Signal sonore</div></div></div><div class="palier-input-row"><input class="palier-num-input" type="number" id="p1val" value="10" min="1" /><span class="palier-unit">verres</span><label class="toggle-switch"><input type="checkbox" id="p1toggle" checked><div class="toggle-track"></div></label></div></div>
+        <div class="palier-config-item"><div class="palier-config-label"><span class="palier-config-emoji">🎉</span><div><div class="palier-config-name">Palier 2</div><div class="palier-config-sub">Annonce + clignotement</div></div></div><div class="palier-input-row"><input class="palier-num-input" type="number" id="p2val" value="25" min="1" /><span class="palier-unit">verres</span><label class="toggle-switch"><input type="checkbox" id="p2toggle" checked><div class="toggle-track"></div></label></div></div>
+        <div class="palier-config-item"><div class="palier-config-label"><span class="palier-config-emoji">🏅</span><div><div class="palier-config-name">Palier 3</div><div class="palier-config-sub">Tirage au sort</div></div></div><div class="palier-input-row"><input class="palier-num-input" type="number" id="p3val" value="50" min="1" /><span class="palier-unit">verres</span><label class="toggle-switch"><input type="checkbox" id="p3toggle" checked><div class="toggle-track"></div></label></div></div>
+        <div class="palier-config-item"><div class="palier-config-label"><span class="palier-config-emoji">🏆</span><div><div class="palier-config-name">Palier 4</div><div class="palier-config-sub">Récompense finale</div></div></div><div class="palier-input-row"><input class="palier-num-input" type="number" id="p4val" value="100" min="1" /><span class="palier-unit">verres</span><label class="toggle-switch"><input type="checkbox" id="p4toggle" checked><div class="toggle-track"></div></label></div></div>
+      </div>
+      <div style="margin-top:16px;"><button class="btn-save-admin" onclick="savePaliers()">💾 Enregistrer les paliers</button></div>
+    </div>
+
+    <!-- LOT -->
+    <div class="admin-section">
+      <div class="admin-section-title">🎁 Lot à gagner ce soir</div>
+      <div class="lot-config-grid">
+        <div class="lot-input-wrap"><label>Nom du lot</label><input class="lot-input" type="text" id="lotNom" value="JBL Flip 6" /></div>
+        <div class="lot-input-wrap"><label>Sponsor</label><input class="lot-input" type="text" id="lotSponsor" value="JBL" /></div>
+        <div class="lot-input-wrap"><label>Palier déclencheur</label><input class="lot-input" type="number" id="lotPalier" value="100" /></div>
+        <div class="lot-input-wrap"><label>Nom de la soirée</label><input class="lot-input" type="text" id="soireeName" value="Soirée BDE Mars" /></div>
+      </div>
+      <div style="margin-top:16px;"><button class="btn-save-admin" onclick="saveLot()">💾 Enregistrer</button></div>
+    </div>
+
+    <!-- TIRAGE -->
+    <div class="admin-section">
+      <div class="admin-section-title">🎲 Tirage au sort</div>
+      <div class="participants-count">
+        <div class="participants-num" id="participantsCount">0</div>
+        <div class="participants-label">participants<br>inscrits ce soir</div>
+      </div>
+      <div class="lottery-lot-input-row">
+        <span class="lottery-lot-label">Lot :</span>
+        <input class="lottery-lot-input" type="text" id="tirageNomLot" value="JBL Flip 6" />
+      </div>
+      <div class="slot-display" id="slotDisplay">— en attente —</div>
+      <button class="btn-tirage" id="btnTirage" onclick="lancerTirage()">🎲 Lancer le tirage au sort</button>
+      <div class="winner-box" id="winnerBox">
+        <span class="winner-emoji">🏆</span>
+        <div class="winner-label">Gagnant(e)</div>
+        <div class="winner-name" id="winnerName">—</div>
+        <div class="winner-sub" id="winnerSub">Remporte le lot !</div>
+        <button onclick="relancerTirage()" style="margin-top:14px;background:rgba(196,168,245,0.15);border:1.5px solid rgba(196,168,245,0.4);border-radius:10px;padding:8px 18px;color:var(--purple);font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;">🔄 Relancer</button>
+      </div>
+    </div>
+
+    <!-- CSV -->
+    <div class="admin-section">
+      <div class="admin-section-title">📥 Export des participants</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;background:rgba(107,217,138,0.06);border:1px solid rgba(107,217,138,0.2);border-radius:14px;padding:16px 18px;">
+        <div style="font-size:2rem;">📋</div>
+        <div><div style="font-weight:800;font-size:.95rem;margin-bottom:3px;">Liste des inscrits</div><div style="color:var(--muted);font-size:.82rem;"><span id="csvParticipantsCount">0</span> participant(s) enregistré(s) ce soir</div></div>
+      </div>
+      <button class="csv-dl-btn" onclick="exportCSV()">📥 Télécharger le CSV</button>
+      <div style="color:var(--muted);font-size:.77rem;margin-top:10px;text-align:center;">Nom, Prénom, Heure d'inscription</div>
+    </div>
+
+    <!-- RESET -->
+    <div class="admin-section">
+      <div class="admin-section-title">🔄 Réinitialisation</div>
+      <div class="reset-card">
+        <div class="reset-warning">
+          <div class="reset-warning-icon">⚠️</div>
+          <div class="reset-warning-text"><strong>Attention :</strong> remet le compteur à zéro, efface les participants et réinitialise les jauges. <strong>L'historique est conservé.</strong></div>
+        </div>
+        <button class="btn-reset-confirm" onclick="confirmReset()">🔄 Réinitialiser la soirée</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADMIN -->
+<div class="modal-overlay" id="adminModal">
+  <div class="modal-backdrop" onclick="closeAdminModal()"></div>
+  <div class="modal-box admin-modal-box">
+    <div class="modal-icon">🔐</div>
+    <div class="modal-title">Interface Admin</div>
+    <div class="modal-sub">Entrez le mot de passe administrateur.</div>
+    <input class="admin-pwd-input" type="password" id="adminPwdInput" placeholder="Mot de passe admin"
+      onkeydown="if(event.key==='Enter') submitAdminPwd()" />
+    <div class="modal-error" id="adminPwdError">❌ Mot de passe incorrect</div>
+    <button class="btn-admin-submit" onclick="submitAdminPwd()">Accéder →</button>
+    <button class="btn-modal-cancel" onclick="closeAdminModal()">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL LOTS -->
+<div class="modal-overlay" id="lotsModal">
+  <div class="modal-backdrop" onclick="closeLotsModal()"></div>
+  <div class="modal-box lots-modal-box">
+    <button class="modal-close" onclick="closeLotsModal()">✕</button>
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:3rem;margin-bottom:8px;">🏆</div>
+      <div style="font-family:'Righteous',cursive;font-size:1.5rem;color:var(--yellow);margin-bottom:4px;">Lot à gagner</div>
+      <div style="color:var(--muted);font-size:.85rem;" id="lotsModalSoiree">Soirée BDE Mars</div>
+    </div>
+    <div style="background:rgba(245,200,66,0.1);border:1.5px solid rgba(245,200,66,0.35);border-radius:16px;padding:18px 20px;text-align:center;margin-bottom:20px;">
+      <div style="font-size:2rem;margin-bottom:6px;">🎵</div>
+      <div style="font-family:'Righteous',cursive;font-size:1.3rem;color:var(--yellow);" id="lotsModalNom">JBL Flip 6</div>
+      <div style="color:var(--muted);font-size:.8rem;margin-top:4px;" id="lotsModalSponsor">Offert par JBL</div>
+    </div>
+    <div style="font-weight:800;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">🎯 Paliers collectifs</div>
+    <div id="lotsModalPaliers" style="display:flex;flex-direction:column;gap:8px;margin-bottom:22px;"></div>
+    <div style="text-align:center;color:var(--muted);font-size:.78rem;line-height:1.5;">🎲 Tirage au sort en fin de soirée parmi tous les participants.</div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span>🎉</span> <span id="toastMsg"></span></div>
+
+<script>
+// ═══════════════════════════
+// MOT DE PASSE ADMIN (fixe)
+// ═══════════════════════════
+var ADMIN_PASSWORD = 'ADMIN2026';
+
+var WORDS_A = ['FLEUR','VAGUE','LUNE','ETOILE','NUAGE','FLAMME','OCEAN','VENT','SOLEIL','BRUME'];
+var WORDS_B = ['BLEU','VERT','ROUGE','OR','ARGENT','ROSE','NOIR','VIOLET','CYAN','AMBRE'];
+
+// ═══════════════════════════
+// LOCALSTORAGE
+// ═══════════════════════════
+function lsSet(key, val) { try { localStorage.setItem(key, val); } catch(e){} }
+function lsGet(key, def) { try { var v=localStorage.getItem(key); return v!==null?v:def; } catch(e){ return def; } }
+function lsSetJSON(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
+function lsGetJSON(key, def) { try { var v=localStorage.getItem(key); return v?JSON.parse(v):def; } catch(e){ return def; } }
+
+// ═══════════════════════════
+// ÉTAT
+// ═══════════════════════════
+var STATE = {
+  soireePwd:    lsGet('picoleau_pwd', ''),
+  verres:       parseInt(lsGet('picoleau_verres', '0'), 10),
+  participants: lsGetJSON('picoleau_participants', []),
+  simulateUsed: false,
+  adminLoggedIn: false,
+  isRegistered: false,
+  paliers: [
+    {val:10,  active:true,  emoji:'🎵', label:'Signal sonore'},
+    {val:25,  active:true,  emoji:'🎉', label:'Annonce + clignotement'},
+    {val:50,  active:true,  emoji:'🏅', label:'Tirage au sort'},
+    {val:100, active:true,  emoji:'🏆', label:'Récompense finale'}
+  ],
+  lot: {nom:'JBL Flip 6', sponsor:'JBL', palier:100, soiree:'Soirée BDE Mars'}
+};
+
+// ═══════════════════════════
+// BULLES
+// ═══════════════════════════
+(function(){
+  var bg=document.getElementById('bubblesBg');
+  for(var i=0;i<18;i++){
+    var b=document.createElement('div'); b.className='bubble';
+    var s=20+Math.random()*80;
+    b.style.cssText='width:'+s+'px;height:'+s+'px;left:'+(Math.random()*100)+'%;animation-duration:'+(8+Math.random()*14)+'s;animation-delay:'+(Math.random()*12)+'s;';
+    bg.appendChild(b);
+  }
+})();
+
+// ═══════════════════════════
+// NAVIGATION
+// ═══════════════════════════
+function showPageRaw(name, btn) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  var p = document.getElementById('page-'+name);
+  if(p) p.classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function showPage(name, btn) {
+  if(!STATE.isRegistered && (name==='dashboard'||name==='about')) {
+    showToast('⚠️ Inscris-toi d\'abord !'); return;
+  }
+  showPageRaw(name, btn);
+}
+function goHome() {
+  showPageRaw('accueil');
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.disabled=true; b.classList.remove('active'); });
+  STATE.isRegistered=false;
+}
+
+// ═══════════════════════════
+// MOT DE PASSE SOIRÉE
+// ═══════════════════════════
+function submitSoireePwd() {
+  var val = document.getElementById('soireePwdInput').value.trim().toUpperCase();
+  var errEl = document.getElementById('soireePwdError');
+  if(!STATE.soireePwd) { showToast('⚠️ Aucun mot de passe défini — contactez l\'admin.'); return; }
+  if(val === STATE.soireePwd.toUpperCase()) {
+    errEl.style.display='none';
+    document.getElementById('soireePwdInput').value='';
+    document.getElementById('navInscription').removeAttribute('disabled');
+    showPageRaw('inscription', document.getElementById('navInscription'));
+    showToast('✅ Bonne soirée ! 🎉');
+  } else {
+    errEl.style.display='block';
+    errEl.style.animation='none';
+    void errEl.offsetHeight;
+    errEl.style.animation='shake .35s';
+    document.getElementById('soireePwdInput').value='';
+  }
+}
+
+// ═══════════════════════════
+// INSCRIPTION
+// ═══════════════════════════
+function handleInscription() {
+  var nom    = document.getElementById('inputNom').value.trim();
+  var prenom = document.getElementById('inputPrenom').value.trim();
+  if(!nom||!prenom) { showToast('⚠️ Remplis les deux champs !'); return; }
+  STATE.isRegistered = true;
+  var heure = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  STATE.participants.push({nom:nom, prenom:prenom, heure:heure});
+  lsSetJSON('picoleau_participants', STATE.participants);
+  document.getElementById('navDashboard').removeAttribute('disabled');
+  document.getElementById('navAbout').removeAttribute('disabled');
+  document.getElementById('formScreen').style.display='none';
+  document.getElementById('mainScreen').style.display='block';
+  document.getElementById('welcomeMsg').textContent='Bienvenue '+prenom+' ! 🎉';
+  updateParticipantsCount();
+  showToast('💧 '+prenom+' a rejoint le défi !');
+  setTimeout(function(){ showPage('dashboard', document.getElementById('navDashboard')); }, 1200);
+}
+
+// ═══════════════════════════
+// DASHBOARD
+// ═══════════════════════════
+function updateDashboard() {
+  var v = STATE.verres;
+  var actifs = STATE.paliers.filter(function(p){return p.active;}).map(function(p){return p.val;}).sort(function(a,b){return a-b;});
+  var target = actifs.length ? actifs[actifs.length-1] : 100;
+  var pct = Math.min(Math.round((v/target)*100), 100);
+  document.getElementById('dashVerres').textContent = v;
+  document.getElementById('adminVerresDisplay').textContent = v;
+  document.getElementById('gaugeBar').style.width = pct+'%';
+  document.getElementById('gaugePct').textContent = pct+'%';
+  var atteints = actifs.filter(function(p){return v>=p;}).length;
+  document.getElementById('dashPaliers').textContent = atteints;
+  var labelsHTML='';
+  actifs.slice(0,6).forEach(function(p){
+    if(v>=p) labelsHTML+='<span style="color:var(--green);">✓ '+p+'</span>';
+    else if(p===actifs.filter(function(x){return x>v;})[0]) labelsHTML+='<span style="color:var(--yellow);">★ '+p+'</span>';
+    else labelsHTML+='<span>'+p+'</span>';
+  });
+  document.getElementById('gaugeLabels').innerHTML = labelsHTML;
+  var next = actifs.filter(function(p){return p>v;})[0];
+  if(next) {
+    document.getElementById('nextPalierText').textContent='Prochain palier : '+next+' verres';
+    document.getElementById('nextPalierSub').textContent='Encore '+(next-v)+' verres → '+STATE.lot.nom+' !';
+    document.getElementById('nextPalierBox').style.display='flex';
+  } else {
+    document.getElementById('nextPalierBox').style.display='none';
+  }
+}
+
+// ═══════════════════════════
+// SIMULER (usage unique)
+// ═══════════════════════════
+function simulateVerre() {
+  if(STATE.simulateUsed) return;
+  STATE.simulateUsed = true;
+  STATE.verres = Math.min(STATE.verres+1, 9999);
+  lsSet('picoleau_verres', STATE.verres);
+  updateDashboard();
+  showToast('💧 +1 verre enregistré !');
+  document.getElementById('simulateArea').innerHTML=
+    '<button class="btn-discover" onclick="openLotsModal()">🎁 Cliquer pour découvrir les lots</button>';
+}
+
+// ═══════════════════════════
+// ADMIN — MODALE
+// ═══════════════════════════
+function openAdminModal() {
+  if(STATE.adminLoggedIn) { syncAdminUI(); showPageRaw('admin'); return; }
+  document.getElementById('adminPwdInput').value='';
+  document.getElementById('adminPwdError').style.display='none';
+  document.getElementById('adminModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  setTimeout(function(){ document.getElementById('adminPwdInput').focus(); }, 100);
+}
+function closeAdminModal() {
+  document.getElementById('adminModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function submitAdminPwd() {
+  var val = document.getElementById('adminPwdInput').value.trim().toUpperCase();
+  var errEl = document.getElementById('adminPwdError');
+  if(val === ADMIN_PASSWORD.toUpperCase()) {
+    STATE.adminLoggedIn = true;
+    closeAdminModal();
+    syncAdminUI();
+    showPageRaw('admin');
+    showToast('✅ Bienvenue dans l\'interface admin !');
+  } else {
+    errEl.style.display='block';
+    errEl.style.animation='none';
+    void errEl.offsetHeight;
+    errEl.style.animation='shake .35s';
+    document.getElementById('adminPwdInput').value='';
+    document.getElementById('adminPwdInput').focus();
+  }
+}
+function logoutAdmin() {
+  STATE.adminLoggedIn=false;
+  showPageRaw('accueil');
+  showToast('🔒 Interface admin verrouillée.');
+}
+
+// ═══════════════════════════
+// ADMIN — MOT DE PASSE SOIRÉE
+// ═══════════════════════════
+function generatePwd() {
+  var w1=WORDS_A[Math.floor(Math.random()*WORDS_A.length)];
+  var w2=WORDS_B[Math.floor(Math.random()*WORDS_B.length)];
+  var num=Math.floor(Math.random()*90)+10;
+  var pwd=w1+w2+num;
+  STATE.soireePwd=pwd;
+  lsSet('picoleau_pwd', pwd);
+  document.getElementById('soireePwdDisplay').textContent=pwd;
+  showToast('🎲 Nouveau mot de passe : '+pwd);
+}
+function setCustomPwd() {
+  var val=document.getElementById('customPwdInput').value.trim().toUpperCase();
+  if(!val){ showToast('⚠️ Entre un mot de passe d\'abord'); return; }
+  STATE.soireePwd=val;
+  lsSet('picoleau_pwd', val);
+  document.getElementById('soireePwdDisplay').textContent=val;
+  document.getElementById('customPwdInput').value='';
+  showToast('✅ Mot de passe défini : '+val);
+}
+function copyPwd() {
+  if(!STATE.soireePwd){ showToast('⚠️ Génère d\'abord un mot de passe'); return; }
+  navigator.clipboard.writeText(STATE.soireePwd).then(function(){
+    showToast('📋 Copié : '+STATE.soireePwd);
+  }).catch(function(){
+    showToast('Mot de passe : '+STATE.soireePwd);
+  });
+}
+
+// ═══════════════════════════
+// ADMIN — COMPTEUR
+// ═══════════════════════════
+function changeVerres(d) {
+  STATE.verres=Math.max(0, STATE.verres+d);
+  lsSet('picoleau_verres', STATE.verres);
+  updateDashboard();
+  showToast(d>0?'💧 +'+d+' verre(s) !':'↩️ −'+Math.abs(d)+' verre(s)');
+}
+function resetVerres() {
+  STATE.verres=0;
+  lsSet('picoleau_verres','0');
+  updateDashboard();
+  showToast('🔄 Compteur remis à 0');
+}
+function setVerresManual() {
+  var raw=document.getElementById('manualVerresInput').value;
+  var val=parseInt(raw, 10);
+  if(raw===''||isNaN(val)||val<0){ showToast('⚠️ Valeur invalide'); return; }
+  STATE.verres=val;
+  lsSet('picoleau_verres', val);
+  document.getElementById('manualVerresInput').value='';
+  updateDashboard();
+  showToast('✅ Compteur à '+val+' verre'+(val!==1?'s':''));
+}
+
+// ═══════════════════════════
+// ADMIN — PALIERS
+// ═══════════════════════════
+function savePaliers() {
+  STATE.paliers[0].val=parseInt(document.getElementById('p1val').value)||10;
+  STATE.paliers[1].val=parseInt(document.getElementById('p2val').value)||25;
+  STATE.paliers[2].val=parseInt(document.getElementById('p3val').value)||50;
+  STATE.paliers[3].val=parseInt(document.getElementById('p4val').value)||100;
+  STATE.paliers[0].active=document.getElementById('p1toggle').checked;
+  STATE.paliers[1].active=document.getElementById('p2toggle').checked;
+  STATE.paliers[2].active=document.getElementById('p3toggle').checked;
+  STATE.paliers[3].active=document.getElementById('p4toggle').checked;
+  updateDashboard();
+  showToast('✅ Paliers enregistrés !');
+}
+
+// ═══════════════════════════
+// ADMIN — LOT
+// ═══════════════════════════
+function saveLot() {
+  STATE.lot.nom    =document.getElementById('lotNom').value.trim()||'Lot';
+  STATE.lot.sponsor=document.getElementById('lotSponsor').value.trim()||'Sponsor';
+  STATE.lot.palier =parseInt(document.getElementById('lotPalier').value)||100;
+  STATE.lot.soiree =document.getElementById('soireeName').value.trim()||'Soirée';
+  document.getElementById('tirageNomLot').value=STATE.lot.nom;
+  updateDashboard();
+  showToast('✅ Lot enregistré : '+STATE.lot.nom);
+}
+
+// ═══════════════════════════
+// ADMIN — TIRAGE
+// ═══════════════════════════
+function updateParticipantsCount() {
+  var n=STATE.participants.length;
+  document.getElementById('participantsCount').textContent=n;
+  var el=document.getElementById('csvParticipantsCount');
+  if(el) el.textContent=n;
+}
+var tirageInterval=null;
+function lancerTirage() {
+  if(!STATE.participants.length){ showToast('⚠️ Aucun participant inscrit !'); return; }
+  var btn=document.getElementById('btnTirage');
+  btn.disabled=true;
+  document.getElementById('winnerBox').classList.remove('show');
+  var slot=document.getElementById('slotDisplay');
+  slot.style.animation='slotSpin .08s infinite';
+  var names=STATE.participants.map(function(p){return p.prenom+' '+p.nom;});
+  var start=Date.now();
+  tirageInterval=setInterval(function(){
+    slot.textContent=names[Math.floor(Math.random()*names.length)];
+    if(Date.now()-start>=3000){
+      clearInterval(tirageInterval);
+      slot.style.animation='';
+      var winner=names[Math.floor(Math.random()*names.length)];
+      slot.textContent=winner;
+      document.getElementById('winnerName').textContent=winner;
+      document.getElementById('winnerSub').textContent='Remporte le '+STATE.lot.nom+' ! 🎉';
+      document.getElementById('winnerBox').classList.add('show');
+      btn.disabled=false;
+      showToast('🏆 Gagnant : '+winner+' !');
+    }
+  }, 80);
+}
+function relancerTirage() {
+  document.getElementById('winnerBox').classList.remove('show');
+  document.getElementById('slotDisplay').textContent='— en attente —';
+}
+
+// ═══════════════════════════
+// ADMIN — CSV
+// ═══════════════════════════
+function exportCSV() {
+  if(!STATE.participants.length){ showToast('⚠️ Aucun participant inscrit !'); return; }
+  var soiree=STATE.lot.soiree||'Soiree';
+  var date=new Date().toLocaleDateString('fr-FR');
+  var rows=[['Nom','Prenom','Heure inscription','Soiree']];
+  STATE.participants.forEach(function(p){
+    rows.push([p.nom, p.prenom, p.heure||'—', soiree]);
+  });
+  var csv=rows.map(function(r){
+    return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(',');
+  }).join('\n');
+  var blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='participants_'+soiree.replace(/\s+/g,'_')+'_'+date.replace(/\//g,'-')+'.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📥 CSV téléchargé — '+STATE.participants.length+' participants');
+}
+
+// ═══════════════════════════
+// ADMIN — RESET
+// ═══════════════════════════
+function confirmReset() {
+  if(!confirm('⚠️ Réinitialiser la soirée ?\nCompteur, participants et jauges remis à zéro.')) return;
+  STATE.verres=0; STATE.simulateUsed=false; STATE.participants=[];
+  lsSet('picoleau_verres','0');
+  lsSetJSON('picoleau_participants',[]);
+  updateDashboard(); updateParticipantsCount();
+  document.getElementById('slotDisplay').textContent='— en attente —';
+  document.getElementById('winnerBox').classList.remove('show');
+  document.getElementById('simulateArea').innerHTML=
+    '<button class="btn-simulate" onclick="simulateVerre()">🔔 Simuler +1 verre</button>';
+  showToast('🔄 Soirée réinitialisée.');
+}
+
+// ═══════════════════════════
+// SYNC UI ADMIN
+// ═══════════════════════════
+function syncAdminUI() {
+  document.getElementById('soireePwdDisplay').textContent=STATE.soireePwd||'——';
+  document.getElementById('adminVerresDisplay').textContent=STATE.verres;
+  document.getElementById('p1val').value=STATE.paliers[0].val;
+  document.getElementById('p2val').value=STATE.paliers[1].val;
+  document.getElementById('p3val').value=STATE.paliers[2].val;
+  document.getElementById('p4val').value=STATE.paliers[3].val;
+  document.getElementById('p1toggle').checked=STATE.paliers[0].active;
+  document.getElementById('p2toggle').checked=STATE.paliers[1].active;
+  document.getElementById('p3toggle').checked=STATE.paliers[2].active;
+  document.getElementById('p4toggle').checked=STATE.paliers[3].active;
+  document.getElementById('lotNom').value=STATE.lot.nom;
+  document.getElementById('lotSponsor').value=STATE.lot.sponsor;
+  document.getElementById('lotPalier').value=STATE.lot.palier;
+  document.getElementById('tirageNomLot').value=STATE.lot.nom;
+  updateParticipantsCount();
+}
+
+// ═══════════════════════════
+// DÉCONNEXION UTILISATEUR
+// ═══════════════════════════
+function deconnecterUtilisateur() {
+  STATE.isRegistered=false; STATE.simulateUsed=false;
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.disabled=true; b.classList.remove('active'); });
+  document.getElementById('formScreen').style.display='block';
+  document.getElementById('mainScreen').style.display='none';
+  document.getElementById('inputNom').value='';
+  document.getElementById('inputPrenom').value='';
+  document.getElementById('simulateArea').innerHTML=
+    '<button class="btn-simulate" onclick="simulateVerre()">🔔 Simuler +1 verre</button>';
+  showPageRaw('accueil');
+  showToast('👋 À bientôt !');
+}
+
+// ═══════════════════════════
+// MODAL LOTS
+// ═══════════════════════════
+function openLotsModal() {
+  document.getElementById('lotsModalNom').textContent=STATE.lot.nom;
+  document.getElementById('lotsModalSponsor').textContent='Offert par '+STATE.lot.sponsor;
+  document.getElementById('lotsModalSoiree').textContent=STATE.lot.soiree;
+  var actifs=STATE.paliers.filter(function(p){return p.active;}).sort(function(a,b){return a.val-b.val;});
+  var html='';
+  actifs.forEach(function(p){
+    var atteint=STATE.verres>=p.val;
+    var estNext=!atteint&&actifs.filter(function(x){return x.val>STATE.verres&&x.val<p.val;}).length===0;
+    var bg=atteint?'rgba(107,217,138,0.1)':estNext?'rgba(245,200,66,0.1)':'rgba(255,255,255,0.04)';
+    var border=atteint?'1px solid rgba(107,217,138,0.3)':estNext?'1.5px solid rgba(245,200,66,0.4)':'1px solid rgba(255,255,255,0.06)';
+    var status=atteint?'<span style="color:var(--green);font-size:.78rem;font-weight:700;">✓ Atteint</span>':
+      estNext?'<span style="color:var(--yellow);font-size:.78rem;font-weight:700;">'+(p.val-STATE.verres)+' restants</span>':
+      '<span style="color:var(--muted);font-size:.78rem;">à venir</span>';
+    html+='<div style="display:flex;align-items:center;gap:10px;background:'+bg+';border:'+border+';border-radius:10px;padding:10px 14px;">'+
+      '<span>'+p.emoji+'</span><span style="flex:1;font-weight:700;font-size:.88rem;">'+p.val+' verres — '+p.label+'</span>'+status+'</div>';
+  });
+  document.getElementById('lotsModalPaliers').innerHTML=html;
+  document.getElementById('lotsModal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeLotsModal() {
+  document.getElementById('lotsModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){ closeLotsModal(); closeAdminModal(); }
+});
+
+// ═══════════════════════════
+// TOAST
+// ═══════════════════════════
+var toastTimer;
+function showToast(msg) {
+  clearTimeout(toastTimer);
+  document.getElementById('toastMsg').textContent=msg;
+  var t=document.getElementById('toast');
+  t.classList.add('show');
+  toastTimer=setTimeout(function(){ t.classList.remove('show'); },3000);
+}
+
+// ═══════════════════════════
+// INIT
+// ═══════════════════════════
+updateDashboard();
+updateParticipantsCount();
+</script>
+</body>
+</html>
